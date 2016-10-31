@@ -1,27 +1,33 @@
 describe('Routes Books', () => {
     const Books = app.datasource.models.Books,
-    defaultBook = {
-        id: 1,
-        name: 'Default Book',
-        description: 'Default desc'
-    };
+        defaultBook = {
+            id: 1,
+            name: 'Default Book',
+            description: 'Default desc'
+        };
 
     beforeEach(done => {
-       Books
-           .destroy({where: {}})
-           .then(() => Books.create(defaultBook))
-           .then(() => {
-              done();
-           });
+        Books
+            .destroy({where: {}})
+            .then(() => Books.create(defaultBook))
+            .then(() => {
+                done();
+            });
     });
     describe('Route GET /books', () => {
         it('should return a list of books', done => {
+            const booksList = Joi.array().items(Joi.object().keys({
+                id: Joi.number(),
+                name: Joi.string(),
+                description: Joi.string(),
+                created_at: Joi.date().iso(),
+                updated_at: Joi.date().iso()
+            }));
+
             request
                 .get('/books')
                 .end((err, res) => {
-                    expect(res.body[0].id).to.be.eql(defaultBook.id);
-                    expect(res.body[0].name).to.be.eql(defaultBook.name);
-
+                    joiAssert(res.body, booksList);
                     done(err);
                 });
         });
@@ -29,12 +35,17 @@ describe('Routes Books', () => {
 
     describe('Route GET /books/{id}', () => {
         it('should return a book', done => {
+            const book = Joi.object().keys({
+                id: Joi.number(),
+                name: Joi.string(),
+                description: Joi.string(),
+                created_at: Joi.date().iso(),
+                updated_at: Joi.date().iso()
+            });
             request
                 .get('/books/1')
                 .end((err, res) => {
-                    expect(res.body.id).to.be.eql(defaultBook.id);
-                    expect(res.body.name).to.be.eql(defaultBook.name);
-
+                    joiAssert(res.body, book);
                     done(err);
                 });
         });
@@ -42,19 +53,25 @@ describe('Routes Books', () => {
 
     describe('Route POST /books', () => {
         it('should create a book', done => {
+            const book = Joi.object().keys({
+                id: Joi.number(),
+                name: Joi.string(),
+                description: Joi.string(),
+                created_at: Joi.date().iso(),
+                updated_at: Joi.date().iso()
+            });
+
             const newBook = {
                 id: 2,
                 name: 'newBook',
-                description: 'newDesc'
+                description: 'Deafult desc'
             };
 
             request
                 .post('/books')
                 .send(newBook)
                 .end((err, res) => {
-                    expect(res.body.id).to.be.eql(newBook.id);
-                    expect(res.body.name).to.be.eql(newBook.name);
-
+                    joiAssert(res.body, book)
                     done(err);
                 });
         });
@@ -67,12 +84,13 @@ describe('Routes Books', () => {
                 name: "updated book"
             };
 
+            const updatedCount = Joi.array().items(1);
+
             request
                 .put('/books/1')
                 .send(updatedBook)
                 .end((err, res) => {
-                    expect(res.body).to.be.eql([1]);
-
+                    joiAssert(res.body, updatedCount);
                     done(err);
                 });
         });

@@ -1,17 +1,17 @@
-import BooksController from '../controllers/books';
+import BooksController from '../controllers/users';
 
 export default (app) => {
-    const booksController = new BooksController(app.datasource.models.Books);
-    app.route('/books')
+    const usersController = new UsersController(app.datasource.models.Users);
+    app.route('/users')
         .get((req, res) => {
-            booksController.getAll()
+            usersController.getAll()
                 .then(response => {
                     res.status(response.statusCode);
                     res.json(response.data);
                 });
         })
         .post((req, res) => {
-            booksController.create(req.body)
+            usersController.create(req.body)
                 .then(response => {
                     res.status(response.statusCode);
                     res.json(response.data);
@@ -20,21 +20,21 @@ export default (app) => {
 
     app.route('/books/:id')
         .get((req, res) => {
-            booksController.getById(req.params)
+            usersController.getById(req.params)
                 .then(response => {
                     res.status(response.statusCode);
                     res.json(response.data);
                 });
         })
         .put((req, res) => {
-            booksController.update(req.body, req.params)
+            usersController.update(req.body, req.params)
                 .then(response => {
-                   res.status(response.statusCode);
-                   res.json(response.data);
+                    res.status(response.statusCode);
+                    res.json(response.data);
                 });
         })
         .delete((req, res) => {
-            booksController.delete(req.params)
+            usersController.delete(req.params)
                 .then(response => {
                     res.sendStatus(response.statusCode);
                 })
